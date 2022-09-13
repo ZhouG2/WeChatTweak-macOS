@@ -8,16 +8,25 @@
 
 #import "WeChatTweak.h"
 #import "NSBundle+WeChatTweak.h"
+#import "SignIn.h"
 
 @implementation NSObject (MultipleInstances)
 
 static void __attribute__((constructor)) tweak(void) {
+    
+    NSLog(@"###:tweak_ constructor");
+    
     [objc_getClass("CUtility") jr_swizzleClassMethod:NSSelectorFromString(@"HasWechatInstance") withClassMethod:@selector(tweak_HasWechatInstance) error:nil];
     [objc_getClass("NSRunningApplication") jr_swizzleClassMethod:NSSelectorFromString(@"runningApplicationsWithBundleIdentifier:") withClassMethod:@selector(tweak_runningApplicationsWithBundleIdentifier:) error:nil];
     class_addMethod(objc_getClass("AppDelegate"), @selector(applicationDockMenu:), method_getImplementation(class_getInstanceMethod(objc_getClass("AppDelegate"), @selector(tweak_applicationDockMenu:))), "@:@");
+    
+    
+
 }
 
 + (BOOL)tweak_HasWechatInstance {
+    NSLog(@"###:tweak_HasWechatInstance");
+    [self tweak_HasWechatInstance];
     return NO;
 }
 
@@ -35,7 +44,15 @@ static void __attribute__((constructor)) tweak(void) {
                                                       action:@selector(openNewWeChatInstace:)
                                                keyEquivalent:@""];
     [menu insertItem:menuItem atIndex:0];
+    
+    [menu insertItem:[[NSMenuItem alloc] initWithTitle:@"签到"
+                                                action:@selector(test:)
+                                         keyEquivalent:@""] atIndex:1];
     return menu;
+}
+
+- (void)test:(id)sender {
+    [SignIn.sharedInstance signIn];
 }
 
 - (void)openNewWeChatInstace:(id)sender {

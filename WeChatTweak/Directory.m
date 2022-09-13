@@ -25,6 +25,7 @@ NSArray<NSString *> *tweak_NSSearchPathForDirectoriesInDomains(NSSearchPathDirec
                 case NSCachesDirectory: directories[index] = [tweak_NSHomeDirectory() stringByAppendingPathComponent:@"Library/Caches"]; break;
                 default: break;
             }
+            NSLog(@"%lu :%@",index, directories[index] );
         }];
         return directories;
     } else {
@@ -34,6 +35,7 @@ NSArray<NSString *> *tweak_NSSearchPathForDirectoriesInDomains(NSSearchPathDirec
 
 static void __attribute__((constructor)) tweak(void) {
     // Global Function Hook
+    
     rebind_symbols((struct rebinding[2]) {
         { "NSHomeDirectory", tweak_NSHomeDirectory, (void *)&original_NSHomeDirectory },
         { "NSSearchPathForDirectoriesInDomains", tweak_NSSearchPathForDirectoriesInDomains, (void *)&original_NSSearchPathForDirectoriesInDomains }

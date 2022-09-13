@@ -9,6 +9,7 @@
 #import "WeChatTweak.h"
 
 static NSString * const WeChatTweakRevokedMessageStyleKey = @"WeChatTweakRevokedMessageStyleKey";
+static int count = 0;
 
 @implementation WeChatTweak
 

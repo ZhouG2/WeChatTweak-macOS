@@ -18,6 +18,7 @@
 @implementation AlfredManager
 
 + (void)load {
+    NSLog(@"AlfredManager:::");
     [AlfredManager.sharedInstance startListener];
 }
     
