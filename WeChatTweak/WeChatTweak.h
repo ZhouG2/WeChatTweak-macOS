@@ -17,7 +17,7 @@ typedef NS_ENUM(NSUInteger, WTRevokedMessageStyle) {
 };
 
 @interface WeChatTweak : NSObject
-
++ (NSInteger) appCount;
 @property (nonatomic, assign, class) WTRevokedMessageStyle revokedMessageStyle;
 @property (nonatomic, assign, class) int instances;
 

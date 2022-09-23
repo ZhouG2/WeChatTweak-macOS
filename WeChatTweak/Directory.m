@@ -12,7 +12,12 @@
 static NSString *(*original_NSHomeDirectory)(void);
 static NSArray<NSString *> *(*original_NSSearchPathForDirectoriesInDomains)(NSSearchPathDirectory directory, NSSearchPathDomainMask domainMask, BOOL expandTilde);
 NSString *tweak_NSHomeDirectory(void) {
-    return [original_NSHomeDirectory() stringByAppendingPathComponent:@"/Library/Containers/com.tencent.xinWeChat/Data/"];
+    NSString *path = @"/Library/Containers/com.tencent.xinWeChat/Data/";
+    if([WeChatTweak appCount]>1){
+        path = [NSString stringWithFormat:@"/Library/Containers/com.tencent.xinWeChat/Data%lu/", [WeChatTweak appCount] -1 ];
+    }
+    
+    return [original_NSHomeDirectory() stringByAppendingPathComponent:path];
 }
 NSArray<NSString *> *tweak_NSSearchPathForDirectoriesInDomains(NSSearchPathDirectory directory, NSSearchPathDomainMask domainMask, BOOL expandTilde) {
     if (domainMask == NSUserDomainMask) {

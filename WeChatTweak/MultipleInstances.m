@@ -12,16 +12,56 @@
 
 @implementation NSObject (MultipleInstances)
 
+static NSInteger appCount = 0;
 static void __attribute__((constructor)) tweak(void) {
     
     NSLog(@"###:tweak_ constructor");
     
     [objc_getClass("CUtility") jr_swizzleClassMethod:NSSelectorFromString(@"HasWechatInstance") withClassMethod:@selector(tweak_HasWechatInstance) error:nil];
+    appCount == [WeChatTweak appCount];
     [objc_getClass("NSRunningApplication") jr_swizzleClassMethod:NSSelectorFromString(@"runningApplicationsWithBundleIdentifier:") withClassMethod:@selector(tweak_runningApplicationsWithBundleIdentifier:) error:nil];
     class_addMethod(objc_getClass("AppDelegate"), @selector(applicationDockMenu:), method_getImplementation(class_getInstanceMethod(objc_getClass("AppDelegate"), @selector(tweak_applicationDockMenu:))), "@:@");
     
     
+    [objc_getClass("CUtility") jr_swizzleClassMethod:NSSelectorFromString(@"isBeingDebugged") withClassMethod:@selector(tweak_isBeingDebugged) error:nil];
+    [objc_getClass("CUtility") jr_swizzleClassMethod:NSSelectorFromString(@"GetUUID") withClassMethod:@selector(tweak_GetUUID) error:nil];
+    
+    
 
+}
+
++ (id)tweak_GetUUID {
+    NSLog(@"###:tweak_HasWechatInstance");
+   
+//    Class cls = NSClassFromString(@"CUtility");
+//    NSString *user = [self performSelector:NSSelectorFromString(@"GetCurrentUserName")];
+    
+    NSString *uid = [self tweak_GetUUID];
+    NSLog(@"UUID0:%@", uid);
+    if(appCount>1){
+        
+        NSString *key = [NSString stringWithFormat:@"_uid_%lu", appCount];
+        NSString *uid1 =  [[NSUserDefaults standardUserDefaults] objectForKey:key];
+
+        if(uid1 ==nil || uid1.length <=0){
+            uid1  = [self performSelector:NSSelectorFromString(@"GetRandomUUID")];
+            uid1 = [uid1 lowercaseString];
+            uid =  [uid1 stringByReplacingOccurrencesOfString:@"-" withString:@""];
+            [[NSUserDefaults standardUserDefaults] setObject:uid forKey:key];
+            
+        }
+        uid = uid1;
+        NSLog(@"UUID1:%@", uid);
+    }
+    
+        
+    return uid;
+}
+
++ (BOOL)tweak_isBeingDebugged {
+    NSLog(@"###:tweak_HasWechatInstance");
+    [self tweak_HasWechatInstance];
+    return NO;
 }
 
 + (BOOL)tweak_HasWechatInstance {

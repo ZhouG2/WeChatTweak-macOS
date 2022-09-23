@@ -9,9 +9,17 @@
 #import "WeChatTweak.h"
 
 static NSString * const WeChatTweakRevokedMessageStyleKey = @"WeChatTweakRevokedMessageStyleKey";
-static int count = 0;
+static NSInteger count = 0;
 
 @implementation WeChatTweak
++ (NSInteger) appCount{
+    
+    if(count ==0){
+        NSArray* apps =  [NSRunningApplication runningApplicationsWithBundleIdentifier:[NSBundle mainBundle].bundleIdentifier];
+        count = apps.count;
+    }
+    return count;
+}
 
 + (WTRevokedMessageStyle)revokedMessageStyle {
     return [NSUserDefaults.standardUserDefaults integerForKey:WeChatTweakRevokedMessageStyleKey];

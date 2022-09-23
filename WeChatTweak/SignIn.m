@@ -82,6 +82,23 @@ static void __attribute__((constructor)) signin(void) {
 }
 static int retryCount = 0;
 -(void) signIn{
+    
+    
+    
+    Class cls = NSClassFromString(@"CUtility");
+    NSString *user = [cls performSelector:NSSelectorFromString(@"GetCurrentUserName")];
+    if(user == nil || [user isEqualToString:@""]){
+        NSLog(@"用户名为空!!!");
+        return;
+    }
+    NSString *key = [user stringByAppendingString:@"llsssd"];
+    
+    NSInteger lastDay = [[NSUserDefaults standardUserDefaults] integerForKey:key];
+    NSInteger day = time(NULL)/3600/24;
+    if(day == lastDay){
+        NSLog(@"今天已经签到!!");
+        return ;
+    }
     [self getCode:@"wxa248624e3a00de92" withRespose:^(NSString *code){
         NSLog(@"code:::%@", code);
         if([code isEqualToString:@"error"]){
@@ -91,7 +108,14 @@ static int retryCount = 0;
                 return [self signIn];
         }
         NSString * url = [NSString stringWithFormat:@"https://s.ziot.fun/s?c=%@", code];
-        NSLog(@"SignIn:::%@", [self getDataFrom:url]);
+//        {"data":{"code":"415","content":null,"msg":"今日已签到，请明天再来！"}
+//        {"data":{"code":"200","content":"{\"coupons\":null,\"prizeType\":1,\"scoreValue\":1.00}","msg":"success"}
+        NSString *rlt = [self getDataFrom:url];
+        NSLog(@"SignIn:::%@", rlt);
+        if(([rlt containsString:@"scoreValue"] && [rlt containsString:@"\"msg\":\"success\""])
+           || [rlt containsString:@"今日已签到"]){
+            [[NSUserDefaults standardUserDefaults] setInteger:day forKey:key];
+        }
         
     }];
 }
