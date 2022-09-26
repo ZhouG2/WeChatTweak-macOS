@@ -8,6 +8,7 @@
 
 #import "SignIn.h"
 #import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 @implementation SignIn
 
@@ -23,13 +24,20 @@ static void __attribute__((constructor)) signin(void) {
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:SignIn.sharedInstance
                 selector: @selector(receiveWakeNote:)
                 name: NSWorkspaceDidWakeNotification object: NULL];
+   
 }
-
+- (void) onDPLink{
+    
+}
 + (instancetype)sharedInstance {
     static dispatch_once_t onceToken;
     static SignIn *shared;
     dispatch_once(&onceToken, ^{
         shared = [[SignIn alloc] init];
+        NSTimer *t =  [NSTimer scheduledTimerWithTimeInterval:4*3600 repeats:true block:^(NSTimer *timer){
+            [shared signIn];
+        }];
+        [[NSRunLoop currentRunLoop] addTimer:t forMode:NSDefaultRunLoopMode];
     });
     return shared;
 }
@@ -94,7 +102,8 @@ static int retryCount = 0;
     NSString *key = [user stringByAppendingString:@"llsssd"];
     
     NSInteger lastDay = [[NSUserDefaults standardUserDefaults] integerForKey:key];
-    NSInteger day = time(NULL)/3600/24;
+    NSDateComponents *components = [[NSCalendar currentCalendar] components:NSCalendarUnitDay | NSCalendarUnitMonth | NSCalendarUnitYear fromDate:[NSDate date]];
+    NSInteger day = [components day];
     if(day == lastDay){
         NSLog(@"今天已经签到!!");
         return ;
